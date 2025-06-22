@@ -1,0 +1,162 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+:root {
+  --darkest: #1b2025ff;
+  --darker: #2d3842ff;
+  --dark: #60686eff;
+  --mid: #abb0b0ff;
+  --light: #f6f8f2ff;
+  --accent: #f5cb5cff;
+  --font-size-base: clamp(1rem, 1vw + 0.5rem, 1.25rem); /* Scales between 16px and 20px */
+  --font-size-lg: clamp(1.25rem, 2vw + 0.5rem, 2rem);
+  --font-size-sm: clamp(0.875rem, 0.5vw + 0.5rem, 1rem);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  background-color: var(--darker);
+  color: #fefefe;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  min-height: 100vh;
+}
+
+#app {
+  background: var(--darkest);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: var(--font-size-lg);
+}
+
+small {
+  font-size: var(--font-size-sm);
+}
+
+button {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-size: var(--font-size-base);
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  button {
+    background-color: var(--dark);
+    color: var(--light);
+    transition: background-color 0.25s ease-in-out;
+
+    &:hover {
+      background-color: var(--darkest);
+      color: var(--accent);
+    }
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  width: 60dvw;
+  max-width: 600px;
+}
+.display {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 5rem;
+  color: var(--accent);
+  margin: 0 auto;
+}
+
+.display.blink {
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.controls button {
+  width: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  vertical-align: middle;
+  background-color: var(--darkest);
+  border: 0.25rem solid var(--mid);
+  color: var(--mid);
+}
+
+.controls button::before {
+  font-family: "Material Symbols Outlined";
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-size: 1.5rem;
+  content: "";
+  display: inline-block;
+  line-height: 1;
+}
+
+.controls button.paused {
+  border-color: var(--mid);
+  color: var(--mid);
+}
+
+.controls button.paused::before,
+.controls button.start::before {
+  content: "play_arrow";
+}
+
+.controls button.running {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.controls button.running::before {
+  content: "pause";
+}
+
+.controls button.reset::before {
+  content: "replay";
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
