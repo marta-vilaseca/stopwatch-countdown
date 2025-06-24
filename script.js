@@ -3,210 +3,318 @@ const btnStopwatch = document.getElementById("btn-stopwatch");
 const btnCountdown = document.getElementById("btn-countdown");
 
 /* HTML Structure checks */
-if (!appContainer) {
-  console.error("Container for the app not found! Make sure the HTML structure is correct.");
+if (!appContainer || !btnStopwatch || !btnCountdown) {
+  console.error("Essential DOM elements not found. Make sure the HTML structure is correct.");
 }
 
-if (!btnStopwatch || !btnCountdown) {
-  console.error("Buttons for switching modes not found! Make sure the HTML structure is correct.");
-}
+/* Timer Controller */
+const TimerController = {
+  timerId: null,
+  currentTime: 0,
+  mode: "stopwatch",
+  isRunning: false,
+  interval: 10,
 
-/* Initialize variables */
-let timerId = null;
-let currentTime = 0; // in milliseconds
-let mode = "stopwatch";
-let isRunning = false;
+  // Callbacks that UI will set
+  onTick: null,
+  onStart: null,
+  onStop: null,
+  onReset: null,
+  onFinish: null,
+
+  start() {
+    if (this.isRunning) return; // Prevent multiple intervals
+    this.isRunning = true;
+
+    if (this.onStart) this.onStart();
+
+    this.timerId = setInterval(() => {
+      if (this.mode === "stopwatch") {
+        this.currentTime += this.interval;
+      } else if (this.mode === "countdown") {
+        this.currentTime -= this.interval;
+        if (this.currentTime <= 0) {
+          this.currentTime = 0;
+          this.stop();
+          if (this.onFinish) this.onFinish();
+          return;
+        }
+      }
+      if (this.onTick) this.onTick(this.currentTime);
+    }, this.interval);
+  },
+
+  stop() {
+    if (!this.isRunning) return;
+    clearInterval(this.timerId);
+    this.isRunning = false;
+    this.timerId = null;
+
+    if (this.onStop) this.onStop();
+  },
+
+  reset() {
+    this.stop();
+    this.currentTime = 0;
+
+    if (this.onReset) this.onReset();
+  },
+
+  setTime(ms) {
+    this.currentTime = ms;
+    if (this.onTick) this.onTick(this.currentTime);
+  },
+
+  setMode(mode) {
+    this.mode = mode;
+    this.reset();
+  },
+};
 
 /* Helper Functions */
-function formatTime(time) {
-  const totalSeconds = Math.floor(time / 1000);
-  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  const centiseconds = String(Math.floor((time % 1000) / 10)).padStart(2, "0");
-  return `${minutes}:${seconds}:${centiseconds}`;
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const centiseconds = Math.floor((ms % 1000) / 10);
+
+  const hoursStr = String(hours).padStart(2, "0");
+  const minutesStr = String(minutes).padStart(2, "0");
+  const secondsStr = String(seconds).padStart(2, "0");
+  const centisecondsStr = String(centiseconds).padStart(2, "0");
+
+  return `${hoursStr}:${minutesStr}:${secondsStr}:<span class="centiseconds">${centisecondsStr}</span>`;
 }
 
-function updateDisplay() {
+function normalizeTime(hours, minutes, seconds) {
+  // Start with the input values
+  let totalSeconds = seconds;
+  let totalMinutes = minutes;
+  let totalHours = hours;
+
+  // Normalize seconds to minutes
+  if (totalSeconds >= 60) {
+    totalMinutes += Math.floor(totalSeconds / 60);
+    totalSeconds = totalSeconds % 60;
+  }
+
+  // Normalize minutes to hours
+  if (totalMinutes >= 60) {
+    totalHours += Math.floor(totalMinutes / 60);
+    totalMinutes = totalMinutes % 60;
+  }
+
+  return {
+    hours: totalHours,
+    minutes: totalMinutes,
+    seconds: totalSeconds,
+  };
+}
+
+/* HTML Template Functions */
+function getDisplayHTML() {
+  return `<div id="display" class="display">00:00:00:<span class="centiseconds">00</span></div>`;
+}
+
+function getControlsHTML() {
+  return `
+    <div id="controls" class="controls">
+      <button id="btn-start" class="start">Start</button>
+      <button id="btn-reset" class="reset">Reset</button>
+    </div>
+  `;
+}
+
+function getKeypadHTML() {
+  return `
+    <div id="keypad" class="keypad">
+      <button>1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>6</button>
+      <button>7</button><button>8</button><button>9</button>
+      <button class="double-width">←</button><button>0</button>
+    </div>
+  `;
+}
+
+/* UI Helper Functions */
+function updateDisplay(time) {
   const display = document.getElementById("display");
-  if (display) display.textContent = formatTime(currentTime);
+  if (display) display.innerHTML = formatTime(time);
 }
 
 function setButtonState(button, state) {
+  if (!button) return; // Ensure button exists
   button.classList.remove("start", "paused", "running");
   button.classList.add(state);
-
-  switch (state) {
-    case "start":
-      button.textContent = "Start";
-      button.title = "Start the stopwatch";
-      break;
-    case "paused":
-      button.textContent = "Continue";
-      button.title = "Continue the stopwatch";
-      break;
-    case "running":
-      button.textContent = "Pause";
-      button.title = "Pause the stopwatch";
-      break;
-  }
+  const buttonText = { start: "Start", paused: "Continue", running: "Pause" };
+  button.textContent = buttonText[state];
+  button.title = `${buttonText[state]} the timer`;
 }
 
-/* Timer Functions */
-function startTimer() {
-  if (isRunning) return; // Prevent multiple intervals
-  isRunning = true;
-
-  const interval = 10;
-
-  timerId = setInterval(() => {
-    if (mode === "stopwatch") {
-      currentTime += interval;
-      updateDisplay();
-    } else if (mode === "countdown") {
-      if (currentTime > 0) {
-        currentTime -= interval;
-        updateDisplay();
-      }
-      if (currentTime <= 0) {
-        currentTime = 0; // Prevent negative values
-        updateDisplay();
-        stopTimer();
-        alert("Countdown finished!");
-      }
+function setDisplayBlink(shouldBlink) {
+  const display = document.getElementById("display");
+  if (display) {
+    if (shouldBlink) {
+      display.classList.add("blink");
+    } else {
+      display.classList.remove("blink");
     }
-  }, interval);
-}
-
-function stopTimer() {
-  clearInterval(timerId);
-  isRunning = false;
-  timerId = null;
-}
-
-function resetTimer() {
-  if (timerId) stopTimer();
-  currentTime = 0;
-  updateDisplay();
+  }
 }
 
 /* UI Setup - Stopwatch */
 function setStopwatchUI() {
   appContainer.innerHTML = `
-    <div id="display" class="display">00:00:00</div>
-    <div id="controls" class="controls">
-      <button id="btn-start" title="Start the stopwatch" class="start">Start</button>
-      <button id="btn-reset" title="Reset the stopwatch" class="reset">Reset</button>
-    </div>
+    ${getDisplayHTML()}
+    ${getControlsHTML()}
   `;
 
   const startButton = document.getElementById("btn-start");
+  const resetButton = document.getElementById("btn-reset");
+
+  // Set up timer callbacks
+  TimerController.onTick = updateDisplay;
+  TimerController.onStart = () => {
+    setButtonState(startButton, "running");
+    setDisplayBlink(false);
+  };
+  TimerController.onStop = () => {
+    setButtonState(startButton, "paused");
+    setDisplayBlink(true);
+  };
+  TimerController.onReset = () => {
+    setButtonState(startButton, "start");
+    setDisplayBlink(false);
+    updateDisplay(0);
+  };
+  TimerController.onFinish = null; // Not needed for stopwatch
 
   startButton.onclick = () => {
-    if (timerId === null) {
-      startTimer();
-      isRunning = true;
-      setButtonState(startButton, "running");
-      display.classList.remove("blink");
-    } else if (isRunning) {
-      stopTimer();
-      isRunning = false;
-      setButtonState(startButton, "paused");
-      display.classList.add("blink");
+    if (!TimerController.isRunning && TimerController.timerId === null) {
+      TimerController.start();
+    } else if (TimerController.isRunning) {
+      TimerController.stop();
     } else {
-      startTimer();
-      isRunning = true;
-      setButtonState(startButton, "running");
-      display.classList.remove("blink");
+      TimerController.start();
     }
   };
 
-  const resetButton = document.getElementById("btn-reset");
   resetButton.onclick = () => {
-    resetTimer();
-    setButtonState(startButton, "start");
-    display.classList.remove("blink");
+    TimerController.reset();
   };
+  // Initialize display
+  updateDisplay(TimerController.currentTime);
 }
 
 /* UI Setup - Countdown */
 function setCountdownUI() {
   appContainer.innerHTML = `
-    <div id="display" class="display">00:00:00</div>
-    <input type="number" id="countdown-input" min="1" placeholder="Seconds" />
-    <div id="controls" class="controls">
-      <button id="btn-start" class="start" title="Start countdown">Start</button>
-      <button id="btn-reset" class="reset" title="Reset countdown">Reset</button>
-    </div>
+    ${getDisplayHTML()}
+    ${getKeypadHTML()}
+    ${getControlsHTML()}
   `;
 
-  const display = document.getElementById("display");
-  const input = document.getElementById("countdown-input");
+  const keypad = document.getElementById("keypad");
   const startButton = document.getElementById("btn-start");
   const resetButton = document.getElementById("btn-reset");
 
-  let hasStarted = false;
+  let inputBuffer = "";
 
-  input.focus();
+  function updateInputDisplay() {
+    // Pad input to 6 digits for HHMMSS format
+    const padded = inputBuffer.padStart(6, "0").slice(-6);
+    const hours = padded.slice(0, 2);
+    const minutes = padded.slice(2, 4);
+    const seconds = padded.slice(4, 6);
+    const display = document.getElementById("display");
+    if (display) {
+      display.innerHTML = `${hours}:${minutes}:${seconds}:<span class="centiseconds">00</span>`;
+    }
+  }
 
-  input.addEventListener("input", () => {
-    const val = Number(input.value.trim());
-    if (!isNaN(val) && val > 0 && val <= 3600) {
-      display.textContent = formatTime(val * 1000);
-    } else {
-      display.textContent = "00:00:00";
+  function clearInput() {
+    inputBuffer = "";
+    updateInputDisplay();
+  }
+
+  // Set up timer callbacks
+  TimerController.onTick = updateDisplay;
+  TimerController.onStart = () => {
+    setButtonState(startButton, "running");
+    setDisplayBlink(false);
+  };
+  TimerController.onStop = () => {
+    setButtonState(startButton, "paused");
+    setDisplayBlink(true);
+  };
+  TimerController.onReset = () => {
+    setButtonState(startButton, "start");
+    setDisplayBlink(false);
+    clearInput();
+  };
+  TimerController.onFinish = () => {
+    setButtonState(startButton, "start");
+    setDisplayBlink(false);
+    alert("Countdown finished!");
+  };
+
+  keypad.addEventListener("click", (e) => {
+    if (TimerController.isRunning) return; // Don't allow input while running
+
+    const key = e.target.textContent;
+
+    if (key >= "0" && key <= "9") {
+      if (inputBuffer.length < 6) {
+        inputBuffer += key;
+        updateInputDisplay();
+      }
+    } else if (key === "←") {
+      inputBuffer = inputBuffer.slice(0, -1);
+      updateInputDisplay();
     }
   });
 
   startButton.onclick = () => {
-    if (!isRunning) {
-      if (!hasStarted) {
-        const val = Number(input.value.trim());
-        if (isNaN(val) || val <= 0 || val > 3600) {
-          alert("Please enter a valid number between 1 and 3600");
-          return;
-        }
-        currentTime = val * 1000;
-        hasStarted = true;
+    if (!TimerController.isRunning) {
+      const padded = inputBuffer.padStart(6, "0");
+      const inputHours = parseInt(padded.slice(0, 2));
+      const inputMinutes = parseInt(padded.slice(2, 4));
+      const inputSeconds = parseInt(padded.slice(4, 6));
+
+      // Normalize the time
+      const normalized = normalizeTime(inputHours, inputMinutes, inputSeconds);
+      const totalMs = normalized.hours * 3600000 + normalized.minutes * 60000 + normalized.seconds * 1000;
+
+      if (totalMs <= 0) {
+        alert("Enter a time greater than 00:00:00");
+        return;
       }
 
-      startTimer();
-      isRunning = true;
-      input.disabled = true;
-      setButtonState(startButton, "running");
-      display.classList.remove("blink");
+      TimerController.setTime(totalMs);
+      TimerController.start();
     } else {
-      stopTimer();
-      isRunning = false;
-      setButtonState(startButton, "paused");
-      display.classList.add("blink");
+      TimerController.stop();
     }
   };
 
   resetButton.onclick = () => {
-    stopTimer();
-    isRunning = false;
-    timerId = null;
-    hasStarted = false;
-    currentTime = 0;
-    input.disabled = false;
-    input.value = "";
-    display.textContent = "00:00:00";
-    setButtonState(startButton, "start");
-    display.classList.remove("blink");
+    TimerController.reset();
   };
+
+  // Initialize
+  updateInputDisplay();
 }
 
 /* Mode Switching */
 function switchToStopwatch() {
-  mode = "stopwatch";
+  TimerController.setMode("stopwatch");
   setStopwatchUI();
-  resetTimer();
 }
 
 function switchToCountdown() {
-  mode = "countdown";
+  TimerController.setMode("countdown");
   setCountdownUI();
-  resetTimer();
 }
 
 btnStopwatch.onclick = switchToStopwatch;
