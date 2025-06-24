@@ -4,16 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stopwatch & Countdown</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   </head>
   <body>
-    <nav id="mode-switcher" class="switcher">
-      <button id="btn-stopwatch">Stopwatch</button>
-      <button id="btn-countdown">Countdown</button>
+    <nav id="mode-switcher" class="switcher" aria-label="Mode Selector">
+      <button id="btn-stopwatch" class="current" aria-current="true" aria-selected="true" tabindex="0">Stopwatch</button>
+      <button id="btn-countdown" aria-selected="false" tabindex="-1">Countdown</button>
     </nav>
 
-    <main id="app">
+    <main id="app" role="main">
       <div class="container">
         <!-- Logic will go here -->
       </div>

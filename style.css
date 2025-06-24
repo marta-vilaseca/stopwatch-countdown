@@ -1,38 +1,55 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
-
+/* =======================
+   CSS Variables (Colors, Fonts, Sizes)
+   ======================= */
 :root {
-  --darkest: #1b2025ff;
-  --darker: #2d3842ff;
-  --dark: #60686eff;
-  --mid: #abb0b0ff;
-  --light: #f6f8f2ff;
-  --accent: #f5cb5cff;
+  --darkest: rgba(27, 32, 37, 1);
+  --darker: rgba(45, 56, 66, 1);
+  --dark: rgba(96, 104, 110, 1);
+  --mid: rgba(171, 176, 176, 1);
+  --light: rgba(246, 248, 242, 1);
+  --accent: rgba(245, 203, 92, 1);
   --font-size-base: clamp(1rem, 1vw + 0.5rem, 1.25rem); /* Scales between 16px and 20px */
   --font-size-lg: clamp(1.25rem, 2vw + 0.5rem, 2rem);
   --font-size-sm: clamp(0.875rem, 0.5vw + 0.5rem, 1rem);
+  --desktop-width: 800px; /* Max width for desktop layout */
 }
 
+/* =======================
+   Feature Support
+   ======================= */
+@supports (font-optical-sizing: auto) {
+  body,
+  button {
+    font-optical-sizing: auto;
+  }
+}
+
+/* =======================
+   Reset & Global Styles
+   ======================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* =======================
+   Body & Layout
+   ======================= */
 body {
   font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
   font-weight: 500;
   font-style: normal;
   font-size: var(--font-size-base);
   line-height: 1.6;
   background-color: var(--darker);
   color: #fefefe;
-  padding: 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 2rem;
+  padding: 2.5rem 1rem;
+  gap: 1rem;
   min-height: 100vh;
 }
 
@@ -40,65 +57,86 @@ body {
   background: var(--darkest);
   border-radius: 1rem;
   padding: 2rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
-h1 {
-  font-size: var(--font-size-lg);
-}
-
+/* =======================
+   Typography
+   ======================= */
 small {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
 }
 
+/* =======================
+   Buttons & Controls
+   ======================= */
 button {
   font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
   font-weight: 500;
   font-style: normal;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   padding: 1rem 2rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
 }
 
-.switcher {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  button {
-    background-color: var(--dark);
-    color: var(--light);
-    transition: background-color 0.25s ease-in-out;
-
-    &:hover {
-      background-color: var(--darkest);
-      color: var(--accent);
-    }
-  }
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
+/* =======================
+   Switcher Component
+   ======================= */
+.switcher {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  width: 100%;
+}
+
+.switcher button {
+  background-color: var(--mid);
+  color: var(--darkest);
+  font-weight: 600;
+  transition: background-color 0.1s ease-in-out;
+}
+
+.switcher button.current,
+.switcher button.current:hover {
+  background-color: var(--darkest);
+  color: var(--accent);
+}
+
+.switcher button:hover {
+  background-color: var(--accent);
+  color: var(--darkest);
+}
+
+/* =======================
+   Container & Display
+   ======================= */
 .container {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 1rem;
-  width: 60dvw;
-  max-width: 600px;
 }
+
 .display {
   font-family: "Space Mono", monospace;
   font-weight: 400;
   font-style: normal;
-  font-size: 5rem;
+  font-size: 3rem;
   color: var(--accent);
   margin: 0 auto;
 }
 
 .display.blink {
   animation: blink 1.2s ease-in-out infinite;
+  will-change: opacity;
 }
 
 .centiseconds {
@@ -106,56 +144,109 @@ button {
   font-size: 0.8em;
 }
 
+/* =======================
+   Controls (Start, Pause, Reset)
+   ======================= */
 .controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
 }
+
 .controls button {
   width: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1rem;
   cursor: pointer;
   vertical-align: middle;
-  background-color: var(--darkest);
+  background-color: var(--mid);
   border: 0.25rem solid var(--mid);
+  color: var(--darkest);
+  font-weight: 600;
+}
+
+.controls button:hover {
+  background-color: var(--darkest);
   color: var(--mid);
 }
 
 .controls button::before {
-  font-family: "Material Symbols Outlined";
-  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-family: "Material Icons";
   font-size: 1.5rem;
-  content: "";
   display: inline-block;
   line-height: 1;
 }
 
-.controls button.paused {
+/* Specific button states */
+button.paused {
+  background-color: var(--mid);
+  color: var(--darkest);
+}
+
+button.paused:hover {
   border-color: var(--mid);
   color: var(--mid);
 }
 
-.controls button.paused::before,
-.controls button.start::before {
+button.paused::before,
+button.start::before {
   content: "play_arrow";
 }
 
-.controls button.running {
+button.running {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--darkest);
+}
+
+button.running:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.controls button.running::before {
+button.running::before {
   content: "pause";
 }
 
-.controls button.reset::before {
+button.reset::before {
   content: "replay";
 }
 
+/* =======================
+   Keypad Component
+   ======================= */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.keypad button {
+  background-color: var(--dark);
+  color: var(--light);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+}
+
+.keypad button:hover {
+  background-color: var(--mid);
+  color: var(--darkest);
+}
+
+.double-width {
+  grid-column: span 2;
+}
+
+/* =======================
+   Animations
+   ======================= */
 @keyframes blink {
   0%,
   100% {
@@ -166,12 +257,47 @@ button {
   }
 }
 
-.keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
+/* =======================
+   Responsive Styles
+   ======================= */
+@media (min-width: 768px) {
+  body {
+    padding: 2rem;
+    gap: 2rem;
+    min-height: 100vh;
+  }
 
-.double-width {
-  grid-column: span 2;
+  #app {
+    border-radius: 1rem;
+    max-width: var(--desktop-width);
+  }
+
+  small {
+    font-size: var(--font-size-sm);
+  }
+
+  button {
+    font-size: var(--font-size-base);
+  }
+
+  .switcher {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    max-width: var(--desktop-width);
+  }
+
+  .display {
+    font-size: 6rem;
+  }
+
+  .controls,
+  .keypad {
+    width: calc(var(--desktop-width) - 10rem);
+    margin: 0 auto;
+  }
+
+  .keypad button {
+    font-size: var(--font-size-base);
+  }
 }

@@ -72,19 +72,21 @@ const TimerController = {
 };
 
 /* Helper Functions */
-function formatTime(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  const centiseconds = Math.floor((ms % 1000) / 10);
+function formatTime(msOrObj, { rawInput = false } = {}) {
+  let hours, minutes, seconds, centiseconds;
 
-  const hoursStr = String(hours).padStart(2, "0");
-  const minutesStr = String(minutes).padStart(2, "0");
-  const secondsStr = String(seconds).padStart(2, "0");
-  const centisecondsStr = String(centiseconds).padStart(2, "0");
+  if (rawInput) {
+    ({ hours, minutes, seconds } = msOrObj);
+    centiseconds = "00"; // Always 00 for raw input
+  } else {
+    const totalSeconds = Math.floor(msOrObj / 1000);
+    hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+    minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+    seconds = String(totalSeconds % 60).padStart(2, "0");
+    centiseconds = String(Math.floor((msOrObj % 1000) / 10)).padStart(2, "0");
+  }
 
-  return `${hoursStr}:${minutesStr}:${secondsStr}:<span class="centiseconds">${centisecondsStr}</span>`;
+  return `${hours}:${minutes}:${seconds}<span class="centiseconds">.${centiseconds}</span>`;
 }
 
 function normalizeTime(hours, minutes, seconds) {
@@ -114,7 +116,7 @@ function normalizeTime(hours, minutes, seconds) {
 
 /* HTML Template Functions */
 function getDisplayHTML() {
-  return `<div id="display" class="display">00:00:00:<span class="centiseconds">00</span></div>`;
+  return `<div id="display" class="display">${formatTime(0)}</div>`;
 }
 
 function getControlsHTML() {
@@ -160,6 +162,21 @@ function setDisplayBlink(shouldBlink) {
     } else {
       display.classList.remove("blink");
     }
+  }
+}
+
+function updateModeButtons(active) {
+  const modes = [
+    { btn: btnStopwatch, id: "stopwatch" },
+    { btn: btnCountdown, id: "countdown" },
+  ];
+
+  for (const { btn, id } of modes) {
+    const isActive = id === active;
+    btn.classList.toggle("current", isActive);
+    btn.setAttribute("aria-current", isActive ? "true" : "false");
+    btn.setAttribute("aria-selected", isActive);
+    btn.setAttribute("tabindex", isActive ? "0" : "-1");
   }
 }
 
@@ -222,14 +239,14 @@ function setCountdownUI() {
   let inputBuffer = "";
 
   function updateInputDisplay() {
-    // Pad input to 6 digits for HHMMSS format
     const padded = inputBuffer.padStart(6, "0").slice(-6);
     const hours = padded.slice(0, 2);
     const minutes = padded.slice(2, 4);
     const seconds = padded.slice(4, 6);
+
     const display = document.getElementById("display");
     if (display) {
-      display.innerHTML = `${hours}:${minutes}:${seconds}:<span class="centiseconds">00</span>`;
+      display.innerHTML = formatTime({ hours, minutes, seconds }, { rawInput: true });
     }
   }
 
@@ -309,11 +326,13 @@ function setCountdownUI() {
 /* Mode Switching */
 function switchToStopwatch() {
   TimerController.setMode("stopwatch");
+  updateModeButtons("stopwatch");
   setStopwatchUI();
 }
 
 function switchToCountdown() {
   TimerController.setMode("countdown");
+  updateModeButtons("countdown");
   setCountdownUI();
 }
 
