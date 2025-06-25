@@ -110,11 +110,6 @@ button:focus-visible {
   color: var(--accent);
 }
 
-.switcher button:hover {
-  background-color: var(--accent);
-  color: var(--darkest);
-}
-
 /* =======================
    Container & Display
    ======================= */
@@ -167,11 +162,6 @@ button:focus-visible {
   font-weight: 600;
 }
 
-.controls button:hover {
-  background-color: var(--darkest);
-  color: var(--mid);
-}
-
 .controls button::before {
   font-family: "Material Icons";
   font-size: 1.5rem;
@@ -185,11 +175,6 @@ button.paused {
   color: var(--darkest);
 }
 
-button.paused:hover {
-  border-color: var(--mid);
-  color: var(--mid);
-}
-
 button.paused::before,
 button.start::before {
   content: "play_arrow";
@@ -199,11 +184,6 @@ button.running {
   background-color: var(--accent);
   border-color: var(--accent);
   color: var(--darkest);
-}
-
-button.running:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 button.running::before {
@@ -235,11 +215,6 @@ button.reset::before {
   transition: background-color 0.1s ease-in-out;
 }
 
-.keypad button:hover {
-  background-color: var(--mid);
-  color: var(--darkest);
-}
-
 .double-width {
   grid-column: span 2;
 }
@@ -254,6 +229,36 @@ button.reset::before {
   }
   50% {
     opacity: 0.2;
+  }
+}
+
+/* =======================
+   Hover States (Desktop/Pointer Devices)
+   ======================= */
+@media (hover: hover) {
+  .switcher button:hover {
+    background-color: var(--accent);
+    color: var(--darkest);
+  }
+
+  .controls button:hover {
+    background-color: var(--darkest);
+    color: var(--mid);
+  }
+
+  button.paused:hover {
+    border-color: var(--mid);
+    color: var(--mid);
+  }
+
+  button.running:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .keypad button:hover {
+    background-color: var(--mid);
+    color: var(--darkest);
   }
 }
 
@@ -299,5 +304,18 @@ button.reset::before {
 
   .keypad button {
     font-size: var(--font-size-base);
+  }
+}
+
+/* =======================
+   Accessibility - Reduced Motion
+   ======================= */
+@media (prefers-reduced-motion: reduce) {
+  .display.blink {
+    animation: none;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
   }
 }

@@ -114,6 +114,9 @@ function normalizeTime(hours, minutes, seconds) {
   };
 }
 
+/* Keyboard Input Handler (Global scope for cleanup) */
+let handleKeyboardInput = null;
+
 /* HTML Template Functions */
 function getDisplayHTML() {
   return `<div id="display" class="display">${formatTime(0)}</div>`;
@@ -182,6 +185,12 @@ function updateModeButtons(active) {
 
 /* UI Setup - Stopwatch */
 function setStopwatchUI() {
+  // Cleanup: Remove keyboard listener when switching to stopwatch
+  if (handleKeyboardInput) {
+    document.removeEventListener("keydown", handleKeyboardInput);
+    handleKeyboardInput = null;
+  }
+
   appContainer.innerHTML = `
     ${getDisplayHTML()}
     ${getControlsHTML()}
@@ -226,6 +235,12 @@ function setStopwatchUI() {
 
 /* UI Setup - Countdown */
 function setCountdownUI() {
+  // Cleanup: Remove previous keyboard listener if exists
+  if (handleKeyboardInput) {
+    document.removeEventListener("keydown", handleKeyboardInput);
+    handleKeyboardInput = null;
+  }
+
   appContainer.innerHTML = `
     ${getDisplayHTML()}
     ${getKeypadHTML()}
@@ -255,6 +270,39 @@ function setCountdownUI() {
     updateInputDisplay();
   }
 
+  function handleInput(key) {
+    if (TimerController.isRunning) return;
+
+    if (key >= "0" && key <= "9") {
+      if (inputBuffer.length < 6) {
+        inputBuffer += key;
+        updateInputDisplay();
+      }
+    } else if (key === "←" || key === "Backspace") {
+      inputBuffer = inputBuffer.slice(0, -1);
+      updateInputDisplay();
+    }
+  }
+
+  // Define handleKeyboardInput with access to local variables
+  handleKeyboardInput = (e) => {
+    if (TimerController.mode !== "countdown") return; // It only works in countdown mode
+
+    if (e.key >= "0" && e.key <= "9") {
+      e.preventDefault();
+      handleInput(e.key);
+    } else if (e.key === "Backspace") {
+      e.preventDefault();
+      handleInput("Backspace");
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      startButton.click();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      resetButton.click();
+    }
+  };
+
   // Set up timer callbacks
   TimerController.onTick = updateDisplay;
   TimerController.onStart = () => {
@@ -277,20 +325,11 @@ function setCountdownUI() {
   };
 
   keypad.addEventListener("click", (e) => {
-    if (TimerController.isRunning) return; // Don't allow input while running
-
     const key = e.target.textContent;
-
-    if (key >= "0" && key <= "9") {
-      if (inputBuffer.length < 6) {
-        inputBuffer += key;
-        updateInputDisplay();
-      }
-    } else if (key === "←") {
-      inputBuffer = inputBuffer.slice(0, -1);
-      updateInputDisplay();
-    }
+    handleInput(key);
   });
+
+  document.addEventListener("keydown", handleKeyboardInput);
 
   startButton.onclick = () => {
     if (!TimerController.isRunning) {
