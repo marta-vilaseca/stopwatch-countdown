@@ -1,4 +1,16 @@
-/* Reset y variables */
+.key-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.key-btn:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  transform: none;
+} /* Reset y variables */
 * {
   margin: 0;
   padding: 0;
@@ -115,7 +127,7 @@ h1 {
 }
 
 .time-display {
-  font-size: 4rem;
+  font-size: clamp(2rem, 8vw, 4rem);
   font-weight: 300;
   font-family: "Courier New", monospace;
   color: var(--text-primary);
@@ -123,13 +135,16 @@ h1 {
   padding: 30px 20px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid var(--border-color);
   transition: var(--transition);
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .time-display.paused {

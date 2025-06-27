@@ -1,3 +1,102 @@
+// Generador de componentes HTML
+class ComponentGenerator {
+  static createTimerSection(id, isActive = false) {
+    const section = document.createElement("section");
+    section.id = id;
+    section.className = `timer-section ${isActive ? "active" : ""}`;
+
+    // Display
+    const displayContainer = document.createElement("div");
+    displayContainer.className = "display-container";
+
+    const display = document.createElement("div");
+    display.id = `${id.replace("-section", "")}-display`;
+    display.className = "time-display";
+    display.textContent = "00:00:00.00";
+
+    displayContainer.appendChild(display);
+    section.appendChild(displayContainer);
+
+    return section;
+  }
+
+  static createControls(prefix) {
+    const controls = document.createElement("div");
+    controls.className = "controls";
+
+    const startBtn = document.createElement("button");
+    startBtn.id = `${prefix}-start`;
+    startBtn.className = "control-btn primary";
+    startBtn.textContent = "Iniciar";
+
+    const resetBtn = document.createElement("button");
+    resetBtn.id = `${prefix}-reset`;
+    resetBtn.className = "control-btn secondary";
+    resetBtn.textContent = "Reiniciar";
+
+    controls.appendChild(startBtn);
+    controls.appendChild(resetBtn);
+
+    return controls;
+  }
+
+  static createTimeInput() {
+    const container = document.createElement("div");
+    container.className = "time-input-container";
+
+    // Display del tiempo
+    const display = document.createElement("div");
+    display.className = "time-input-display";
+
+    const timeParts = [
+      { id: "hours-input", label: "h" },
+      { id: "minutes-input", label: "m" },
+      { id: "seconds-input", label: "s" },
+    ];
+
+    timeParts.forEach((part, index) => {
+      if (index > 0) {
+        const separator = document.createElement("span");
+        separator.className = "separator";
+        separator.textContent = ":";
+        display.appendChild(separator);
+      }
+
+      const timePart = document.createElement("span");
+      timePart.className = "time-part";
+
+      const value = document.createElement("span");
+      value.id = part.id;
+      value.textContent = "00";
+
+      const label = document.createElement("label");
+      label.textContent = part.label;
+
+      timePart.appendChild(value);
+      timePart.appendChild(label);
+      display.appendChild(timePart);
+    });
+
+    container.appendChild(display);
+
+    // Keypad
+    const keypad = document.createElement("div");
+    keypad.className = "keypad";
+
+    const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "backspace"];
+    keys.forEach((key) => {
+      const btn = document.createElement("button");
+      btn.className = `key-btn ${key === "0" ? "zero" : ""} ${key === "backspace" ? "backspace" : ""}`;
+      btn.dataset.key = key;
+      btn.textContent = key === "backspace" ? "⌫" : key;
+      keypad.appendChild(btn);
+    });
+
+    container.appendChild(keypad);
+    return container;
+  }
+}
+
 // Clase base para manejar funcionalidades comunes de timer
 class BaseTimer {
   constructor(displayElement, startButton, resetButton) {
@@ -131,6 +230,9 @@ class Countdown extends BaseTimer {
     this.isRunning = true;
     this.isPaused = false;
 
+    // Desactivar keypad
+    this.timeInputManager.setEnabled(false);
+
     this.intervalId = setInterval(() => {
       this.remainingCentiseconds--;
       this.updateDisplayText();
@@ -176,6 +278,8 @@ class Countdown extends BaseTimer {
     this.updateButtonText();
     this.updateDisplay();
     this.timeInputManager.reset();
+    // Reactivar keypad
+    this.timeInputManager.setEnabled(true);
   }
 
   finish() {
@@ -186,6 +290,8 @@ class Countdown extends BaseTimer {
     this.updateDisplayText();
     this.updateButtonText();
     this.updateDisplay();
+    // Reactivar keypad
+    this.timeInputManager.setEnabled(true);
     alert("¡Tiempo agotado!");
   }
 
@@ -215,38 +321,41 @@ class Countdown extends BaseTimer {
 // Gestor del input de tiempo personalizado
 class TimeInputManager {
   constructor() {
+    this.currentInput = "";
+    this.maxLength = 6; // HHMMSS
+    this.enabled = true;
+
+    // Los elementos se asignarán después de que se genere el HTML
+    this.hoursElement = null;
+    this.minutesElement = null;
+    this.secondsElement = null;
+    this.keypadButtons = null;
+
+    this.reset();
+  }
+
+  setElements() {
     this.hoursElement = document.getElementById("hours-input");
     this.minutesElement = document.getElementById("minutes-input");
     this.secondsElement = document.getElementById("seconds-input");
-    this.currentInput = "";
-    this.maxLength = 6; // HHMMSS
-
+    this.keypadButtons = document.querySelectorAll(".key-btn");
     this.bindEvents();
-    this.reset();
   }
 
   bindEvents() {
     // Eventos del teclado numérico
-    document.querySelectorAll(".key-btn").forEach((btn) => {
+    this.keypadButtons.forEach((btn) => {
       btn.addEventListener("click", (e) => {
+        if (!this.enabled) return;
         const key = e.target.dataset.key;
         this.handleKeyInput(key);
       });
     });
-
-    // Soporte para teclado físico
-    document.addEventListener("keydown", (e) => {
-      if (document.getElementById("countdown-section").classList.contains("active")) {
-        if (e.key >= "0" && e.key <= "9") {
-          this.handleKeyInput(e.key);
-        } else if (e.key === "Backspace") {
-          this.handleKeyInput("backspace");
-        }
-      }
-    });
   }
 
   handleKeyInput(key) {
+    if (!this.enabled) return;
+
     if (key === "backspace") {
       this.currentInput = this.currentInput.slice(0, -1);
     } else if (key >= "0" && key <= "9" && this.currentInput.length < this.maxLength) {
@@ -256,7 +365,16 @@ class TimeInputManager {
     this.updateDisplay();
   }
 
+  setEnabled(enabled) {
+    this.enabled = enabled;
+    this.keypadButtons.forEach((btn) => {
+      btn.disabled = !enabled;
+    });
+  }
+
   updateDisplay() {
+    if (!this.hoursElement) return;
+
     // Rellenar con ceros a la izquierda
     const padded = this.currentInput.padStart(6, "0");
 
@@ -286,12 +404,100 @@ class TimeInputManager {
   }
 }
 
+// Gestor de teclado global
+class KeyboardManager {
+  constructor(timers) {
+    this.timers = timers;
+    this.timeInputManager = null;
+    this.bindEvents();
+  }
+
+  setTimeInputManager(timeInputManager) {
+    this.timeInputManager = timeInputManager;
+  }
+
+  bindEvents() {
+    document.addEventListener("keydown", (e) => {
+      // Prevenir comportamiento por defecto para las teclas que manejamos
+      if (e.code === "Space" || e.key === "Escape") {
+        e.preventDefault();
+      }
+
+      const activeTimer = this.getActiveTimer();
+
+      switch (e.code) {
+        case "Space":
+          if (activeTimer) {
+            activeTimer.toggleTimer();
+          }
+          break;
+        case "Escape":
+          if (activeTimer) {
+            activeTimer.reset();
+          }
+          break;
+        default:
+          // Manejar input numérico solo en countdown
+          if (this.isCountdownActive() && this.timeInputManager) {
+            if (e.key >= "0" && e.key <= "9") {
+              this.timeInputManager.handleKeyInput(e.key);
+            } else if (e.key === "Backspace") {
+              this.timeInputManager.handleKeyInput("backspace");
+            }
+          }
+          break;
+      }
+    });
+  }
+
+  getActiveTimer() {
+    if (this.isStopwatchActive()) {
+      return this.timers.stopwatch;
+    } else if (this.isCountdownActive()) {
+      return this.timers.countdown;
+    }
+    return null;
+  }
+
+  isStopwatchActive() {
+    const section = document.getElementById("stopwatch-section");
+    return section && section.classList.contains("active");
+  }
+
+  isCountdownActive() {
+    const section = document.getElementById("countdown-section");
+    return section && section.classList.contains("active");
+  }
+}
+
 // Gestor principal de la aplicación
 class TimerApp {
   constructor() {
+    this.generateHTML();
     this.initializeElements();
     this.initializeTimers();
     this.bindModeSelector();
+    this.initializeKeyboard();
+  }
+
+  generateHTML() {
+    const main = document.querySelector("main");
+
+    // Generar sección cronómetro
+    const stopwatchSection = ComponentGenerator.createTimerSection("stopwatch-section", true);
+    const stopwatchControls = ComponentGenerator.createControls("stopwatch");
+    stopwatchSection.appendChild(stopwatchControls);
+
+    // Generar sección cuenta atrás
+    const countdownSection = ComponentGenerator.createTimerSection("countdown-section");
+    const timeInput = ComponentGenerator.createTimeInput();
+    const countdownControls = ComponentGenerator.createControls("countdown");
+
+    countdownSection.appendChild(timeInput);
+    countdownSection.appendChild(countdownControls);
+
+    main.appendChild(stopwatchSection);
+    main.appendChild(countdownSection);
   }
 
   initializeElements() {
@@ -317,12 +523,23 @@ class TimerApp {
   initializeTimers() {
     // Inicializar gestor de input de tiempo
     this.timeInputManager = new TimeInputManager();
+    this.timeInputManager.setElements();
 
     // Inicializar cronómetro
     this.stopwatch = new Stopwatch(this.stopwatchDisplay, this.stopwatchStartBtn, this.stopwatchResetBtn);
 
     // Inicializar cuenta atrás
     this.countdown = new Countdown(this.countdownDisplay, this.countdownStartBtn, this.countdownResetBtn, this.timeInputManager);
+
+    this.timers = {
+      stopwatch: this.stopwatch,
+      countdown: this.countdown,
+    };
+  }
+
+  initializeKeyboard() {
+    this.keyboardManager = new KeyboardManager(this.timers);
+    this.keyboardManager.setTimeInputManager(this.timeInputManager);
   }
 
   bindModeSelector() {
