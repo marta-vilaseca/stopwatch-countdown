@@ -147,6 +147,12 @@ h1 {
   overflow: hidden;
 }
 
+.time-display.large-time {
+  font-size: clamp(1.8rem, 7vw, 3.5rem); /* Reducir un poco el tamaño */
+  padding: 30px 50px; /* Más padding para valores grandes */
+  min-width: 400px; /* Ancho mínimo mayor */
+}
+
 .time-display.paused {
   animation: blink 1s infinite;
 }

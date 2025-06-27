@@ -121,6 +121,18 @@ class BaseTimer {
     const seconds = Math.floor((totalCentiseconds % 6000) / 100);
     const centiseconds = totalCentiseconds % 100;
 
+    // Detectar si el tiempo es "grande" (más de 99 horas)
+    const isLargeTime = hours > 99;
+
+    // Aplicar clase CSS según el tamaño del tiempo
+    if (this.displayElement) {
+      if (isLargeTime) {
+        this.displayElement.classList.add("large-time");
+      } else {
+        this.displayElement.classList.remove("large-time");
+      }
+    }
+
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${centiseconds.toString().padStart(2, "0")}`;
   }
 

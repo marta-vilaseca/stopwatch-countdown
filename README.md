@@ -156,3 +156,150 @@ Genial!!! Tengo algunos apuntes y correcciones, pero en general has hecho muy bu
 - Mantiene legibilidad en todos los dispositivos
 
 ¡Ahora la aplicación está mucho más pulida y profesional! El keypad se comporta correctamente, el código es más mantenible y los atajos de teclado hacen la experiencia de usuario mucho más fluida.
+
+## 🔃 Iteración #02
+
+> [!IMPORTANT]  
+> La versión gratuita de Claude no deja que los chats excedan de cierta longitud, así que para este último ajuste he abierto un chat nuevo con el mismo modelo, dándole el contexto necesario para ajustar el detalle que quería
+
+### Prompt
+
+Hola! Me has ayudado antes con una aplicación de stopwatch/countdown, te adjunto el código como referencia.
+
+_(\* HTML, CSS y JavaScript adjuntos)_
+
+Todo funciona perfecto, pero todavía tenemos un pequeño problema con la visualización del display. Los dígitos encajan justo dentro del recuadro; si el usuario introduce un valor temporal grande que deba normalizarse a más de 100 horas, el ancho total del tiempo a mostrar aumenta ligeramente y "se sale" de los límites del display, quedando parcialmente oculto. De nuevo, solo ocurre en desktop. Podemos solucionarlo? Quizás aumentando el padding lateral de la caja del display o reduciendo un poco más el tamaño de los dígitos.
+
+### Resultado
+
+Perfecto, veo el problema. Cuando el tiempo excede las 99 horas, el display muestra más de 8 caracteres (como "100:30:45.50" en lugar de "01:30:45.50"), lo que hace que el texto se salga del contenedor.
+Te propongo varias soluciones. La más elegante sería combinar un aumento del padding lateral con una reducción ligera del tamaño de fuente para valores muy grandes.
+
+Aquí tienes las opciones:
+
+```css
+/* Solución 1: Aumentar padding lateral y hacer el contenedor más responsive */
+.time-display {
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 300;
+  font-family: "Courier New", monospace;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 30px 40px; /* Aumentado de 20px a 40px el padding lateral */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  letter-spacing: 0.05em;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-color);
+  transition: var(--transition);
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  /* Hacer el contenedor un poco más ancho para valores grandes */
+  min-width: 350px;
+}
+
+/* Solución 2: Clase adicional para cuando el tiempo es muy grande (>99 horas) */
+.time-display.large-time {
+  font-size: clamp(1.8rem, 7vw, 3.5rem); /* Reducir un poco el tamaño */
+  padding: 30px 50px; /* Más padding para valores grandes */
+  min-width: 400px; /* Ancho mínimo mayor */
+}
+
+/* Solución 3: Media queries específicas para desktop */
+@media (min-width: 601px) {
+  .time-display {
+    padding: 30px 50px; /* Más padding en desktop */
+    min-width: 380px;
+    font-size: clamp(2rem, 6vw, 3.8rem); /* Ligeramente más pequeño en desktop */
+  }
+
+  .time-display.large-time {
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    padding: 30px 60px;
+    min-width: 420px;
+  }
+}
+
+/* Mantener el responsive para móviles */
+@media (max-width: 600px) {
+  .time-display {
+    font-size: 2.5rem;
+    padding: 20px 25px; /* Aumentado ligeramente */
+    min-height: 100px;
+    min-width: 280px; /* Ancho mínimo para móviles */
+  }
+
+  .time-display.large-time {
+    font-size: 2.2rem; /* Más pequeño para valores grandes en móvil */
+    padding: 20px 30px;
+  }
+}
+
+@media (max-width: 400px) {
+  .time-display {
+    font-size: 2rem;
+    padding: 20px;
+    min-width: 250px;
+  }
+
+  .time-display.large-time {
+    font-size: 1.8rem;
+    padding: 20px 25px;
+  }
+}
+```
+
+Ahora necesitamos modificar el JavaScript para aplicar la clase large-time cuando sea necesario:
+
+```javascript
+// Método mejorado para formatear tiempo con detección de valores grandes
+formatTime(totalCentiseconds) {
+  const hours = Math.floor(totalCentiseconds / 360000);
+  const minutes = Math.floor((totalCentiseconds % 360000) / 6000);
+  const seconds = Math.floor((totalCentiseconds % 6000) / 100);
+  const centiseconds = totalCentiseconds % 100;
+
+  // Detectar si el tiempo es "grande" (más de 99 horas)
+  const isLargeTime = hours > 99;
+
+  // Aplicar clase CSS según el tamaño del tiempo
+  if (this.displayElement) {
+    if (isLargeTime) {
+      this.displayElement.classList.add('large-time');
+    } else {
+      this.displayElement.classList.remove('large-time');
+    }
+  }
+
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${centiseconds.toString().padStart(2, "0")}`;
+}
+
+// Para el cronómetro, actualizar el método updateDisplayText
+updateDisplayText() {
+  this.displayElement.textContent = this.formatTime(this.centiseconds);
+}
+
+// Para la cuenta atrás, actualizar el método updateDisplayText
+updateDisplayText() {
+  this.displayElement.textContent = this.formatTime(this.remainingCentiseconds);
+}
+```
+
+#### Resumen de las soluciones:
+
+- Padding lateral aumentado: De 20px a 40px en desktop, de 15px a 25px en móvil
+- Ancho mínimo: Se establecen anchos mínimos para evitar que el contenedor sea demasiado estrecho
+- Clase dinámica: Se aplica automáticamente la clase large-time cuando el tiempo excede 99 horas
+- Tamaño de fuente adaptativo: Ligeramente más pequeño para valores grandes
+- Media queries específicas: Diferentes valores para desktop y móvil
+
+#### Para implementar:
+
+- Reemplaza las reglas CSS de .time-display con las del primer artifact
+- Modifica el método formatTime en ambas clases (Stopwatch y Countdown) con el código del segundo artifact
+
+Esto debería resolver completamente el problema de overflow, manteniendo una buena legibilidad tanto para valores pequeños como grandes, y conservando el diseño responsive.
