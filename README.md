@@ -1,6 +1,16 @@
 # Stopwatch & Countdown Timer
 
-Versión experimental generada enteramente utilizando **Claude Sonnet 4**
+Versión experimental generada enteramente utilizando la versión gratuita de **Claude Sonnet 4**, por disponibilidad y preferencia personal (suele darme muy buenos resultados a la hora de generar código)
+
+### Tabla de contenidos
+
+[🌱 Prompt inicial](#-prompt-inicial)  
+[🔃 Iteración #01](#-iteración-01)  
+[🔃 Iteración #02](#-iteración-02)  
+[📋 Resumen de características](#-resumen-de-características)  
+[💡 Conclusiones](#-conclusiones)
+
+---
 
 ## 🌱 Prompt inicial
 
@@ -56,7 +66,7 @@ Genérame por favor el archivo HTML, el archivo CSS y el archivo JavaScript por 
 
 ##### Cronómetro:
 
-- Cuenta hacia adelante en formato HH:MM:SS.cc
+- Cuenta hacia adelante en formato `HH:MM:SS.cc`
 - Botones Iniciar/Pausar/Continuar y Reiniciar
 - Parpadeo del display cuando está pausado
 
@@ -71,7 +81,7 @@ Genérame por favor el archivo HTML, el archivo CSS y el archivo JavaScript por 
 
 ##### Características Técnicas:
 
-- Código reutilizable: Clase base BaseTimer para funcionalidades comunes
+- Código reutilizable: Clase base `BaseTimer` para funcionalidades comunes
 - Precisión: Intervalos de 10ms para centésimas de segundo
 - Responsive: Adapta el diseño a diferentes tamaños de pantalla
 - Accesibilidad: Navegación por teclado y controles intuitivos
@@ -90,6 +100,10 @@ Genérame por favor el archivo HTML, el archivo CSS y el archivo JavaScript por 
 - Gestión de estados para evitar conflictos entre modos
 
 Los archivos están listos para usar. Solo necesitas colocar los tres archivos en la misma carpeta y abrir index.html en tu navegador. ¡Todo funciona sin dependencias externas!
+
+[🔝 Volver arriba](#tabla-de-contenidos)
+
+---
 
 ## 🔃 Iteración #01
 
@@ -114,15 +128,15 @@ Genial!!! Tengo algunos apuntes y correcciones, pero en general has hecho muy bu
 
 **2. Generación dinámica de HTML:**
 
-- Nueva clase ComponentGenerator que crea todos los elementos dinámicamente
+- Nueva clase `ComponentGenerator` que crea todos los elementos dinámicamente
 - Reutilización completa: Display y controles se generan una sola vez y se reutilizan
 - Código más limpio: HTML queda minimalista, JavaScript maneja toda la estructura
 - Mejor mantenibilidad: Cambios en componentes se hacen en un solo lugar
 
 **3. Display responsive arreglado:**
 
-- clamp(2rem, 8vw, 4rem) para tamaño responsivo del texto
-- overflow: hidden y white-space: nowrap para evitar desbordamiento
+- `clamp(2rem, 8vw, 4rem)` para tamaño responsivo del texto
+- `overflow: hidden` y `white-space: nowrap` para evitar desbordamiento
 - Letter-spacing reducido para dar más espacio
 - Funciona perfectamente tanto en mobile como desktop
 
@@ -130,7 +144,7 @@ Genial!!! Tengo algunos apuntes y correcciones, pero en general has hecho muy bu
 
 - Espacio (Space): Inicia/Pausa/Continúa el timer activo
 - Escape (Esc): Resetea el timer activo
-- Nueva clase KeyboardManager que gestiona todos los eventos de teclado
+- Nueva clase `KeyboardManager` que gestiona todos los eventos de teclado
 - Funciona con ambos modos: Detecta automáticamente qué timer está activo
 - Previene comportamiento por defecto para evitar scroll con espacio
 
@@ -138,8 +152,8 @@ Genial!!! Tengo algunos apuntes y correcciones, pero en general has hecho muy bu
 
 ##### Arquitectura mejorada:
 
-- ComponentGenerator: Generación dinámica de componentes HTML
-- KeyboardManager: Gestión centralizada de eventos de teclado
+- `ComponentGenerator`: Generación dinámica de componentes HTML
+- `KeyboardManager`: Gestión centralizada de eventos de teclado
 - Separación de responsabilidades: Cada clase tiene una función específica
 - Código más modular: Fácil de extender y mantener
 
@@ -156,6 +170,10 @@ Genial!!! Tengo algunos apuntes y correcciones, pero en general has hecho muy bu
 - Mantiene legibilidad en todos los dispositivos
 
 ¡Ahora la aplicación está mucho más pulida y profesional! El keypad se comporta correctamente, el código es más mantenible y los atajos de teclado hacen la experiencia de usuario mucho más fluida.
+
+[🔝 Volver arriba](#tabla-de-contenidos)
+
+---
 
 ## 🔃 Iteración #02
 
@@ -293,13 +311,117 @@ updateDisplayText() {
 
 - Padding lateral aumentado: De 20px a 40px en desktop, de 15px a 25px en móvil
 - Ancho mínimo: Se establecen anchos mínimos para evitar que el contenedor sea demasiado estrecho
-- Clase dinámica: Se aplica automáticamente la clase large-time cuando el tiempo excede 99 horas
+- Clase dinámica: Se aplica automáticamente la clase `large-time` cuando el tiempo excede 99 horas
 - Tamaño de fuente adaptativo: Ligeramente más pequeño para valores grandes
 - Media queries específicas: Diferentes valores para desktop y móvil
 
 #### Para implementar:
 
-- Reemplaza las reglas CSS de .time-display con las del primer artifact
-- Modifica el método formatTime en ambas clases (Stopwatch y Countdown) con el código del segundo artifact
+- Reemplaza las reglas CSS de `.time-display` con las del primer artifact
+- Modifica el método `formatTime` en ambas clases (`Stopwatch` y `Countdown`) con el código del segundo artifact
 
 Esto debería resolver completamente el problema de overflow, manteniendo una buena legibilidad tanto para valores pequeños como grandes, y conservando el diseño responsive.
+
+[🔝 Volver arriba](#tabla-de-contenidos)
+
+---
+
+## 📋 Resumen de características
+
+_\* Generado también con la ayuda de Claude_
+
+#### 🌟 Características Destacadas
+
+- Zero Dependencies: No requiere librerías externas
+- Offline Ready: Funciona sin conexión a internet
+- Cross-browser: Compatible con navegadores modernos
+- Lightweight: Código optimizado y eficiente
+
+#### 🏃‍♂️ Cronómetro
+
+- Precisión de centésimas: Medición hasta 0.01 segundos
+- Formato extendido: Soporte para tiempos superiores a 99 horas
+- Controles intuitivos: Iniciar, pausar, continuar y reiniciar
+
+#### ⏰ Cuenta Atrás
+
+- Input personalizado: Teclado numérico integrado para configurar el tiempo
+- Formato flexible: Acepta horas, minutos y segundos
+- Normalización automática: Convierte automáticamente valores como 90 segundos a 1:30
+- Notificación: Alerta visual al finalizar
+- Validación: Previene iniciar con tiempo cero
+
+#### 🎨 Interfaz de Usuario
+
+- Totalmente responsiva: Optimizada para móviles, tablets y escritorio
+- Animaciones fluidas: Transiciones suaves y efectos de hover
+- Indicador visual: Parpadeo cuando el timer está pausado
+- Navegación por pestañas: Cambio fluido entre cronómetro y cuenta atrás
+
+#### ⌨️ Controles de Teclado
+
+- Barra espaciadora: Iniciar/pausar/continuar el timer activo
+- Escape: Reiniciar el timer activo
+- Números 0-9: Input directo en modo cuenta atrás
+- Backspace: Borrar último dígito en cuenta atrás
+
+#### 📱 Diseño Responsivo
+
+- Breakpoints optimizados: 600px y 400px para diferentes dispositivos
+- Tipografía escalable: Tamaños de fuente que se adaptan al viewport
+- Layout flexible: Controles que se reorganizan en pantallas pequeñas
+- Touch-friendly: Botones y áreas de toque optimizadas para móviles
+
+#### 🛠️ Tecnologías
+
+##### HTML5
+
+- Estructura semántica
+
+##### CSS3
+
+- Variables CSS personalizadas
+- Flexbox y Grid
+- Animaciones y transiciones
+- Media queries avanzadas
+
+##### JavaScript ES6+
+
+- Clases y módulos
+- Event listeners
+- Intervals de alta precisión
+- Arquitectura orientada a objetos
+
+#### 📋 Funcionalidades Técnicas
+
+##### Arquitectura del Código
+
+- Patrón de clases: Código organizado en clases especializadas
+- Separación de responsabilidades: `ComponentGenerator`, `BaseTimer`, `TimeInputManager`
+- Generación dinámica: HTML generado programáticamente
+- Event delegation: Manejo eficiente de eventos
+
+##### Características Avanzadas
+
+- Precisión temporal: Intervalos de 10ms para máxima precisión
+- Gestión de estado: Control completo del estado de cada timer
+- Validación de entrada: Normalización automática de tiempos
+- Accesibilidad: Soporte para navegación por teclado
+- Performance: Actualización eficiente del DOM
+
+[🔝 Volver arriba](#tabla-de-contenidos)
+
+---
+
+## 💡 Conclusiones
+
+- Con instrucciones claras y pocas iteraciones, ha sido capaz de generar lo que necesitaba casi a la primera, requiriendo de muy pocos ajustes
+  - Lo cual indica que hacer bien el trabajo previo de pensar y conceptualizar el componente o app es clave, para no "marear" innecesariamente a la IA ni tener que corregirle decisiones o interpretaciones incorrectas conforme lo que se le ha pedido
+  - El éxito radica en encaminarla correctamente desde el primer momento, dejando los menos cabos sueltos posibles a la hora de explicarle qué queremos y cómo lo queremos
+- A pesar de que yo opté (en mi versión) por no utilizar una arquitectura basada en clases, por defecto es el _approach_ que Claude ha decidido tomar y el resultado es coherente y correcto
+- Si hay un punto débil a destacar de la IA durante este proceso sería el manejo de según qué cuestiones de CSS:
+  - el problema de visualización del display para tiempos más largos, primero se ha dado por resuelto cuando no lo estaba
+  - y de las cuatro soluciones propuestas en la iteración 2, solamente funcionaba la tercera, que es la que finalmente he aplicado.
+  - sin analizar el código a fondo, creo que habría algna forma más sencilla de aplicar un padding o espacio extra que diera un cierto margen siempre, que quedara bien con el estándar `HH:MM:SS.cc` y que nos sirviera para dar cabida a valores `HHH:MM:SS.cc` en caso de que se produzcan
+
+[🔝 Volver arriba](#tabla-de-contenidos)
