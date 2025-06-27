@@ -1,321 +1,365 @@
-/* =======================
-   CSS Variables (Colors, Fonts, Sizes)
-   ======================= */
-:root {
-  --darkest: rgba(27, 32, 37, 1);
-  --darker: rgba(45, 56, 66, 1);
-  --dark: rgba(96, 104, 110, 1);
-  --mid: rgba(171, 176, 176, 1);
-  --light: rgba(246, 248, 242, 1);
-  --accent: rgba(245, 203, 92, 1);
-  --font-size-base: clamp(1rem, 1vw + 0.5rem, 1.25rem); /* Scales between 16px and 20px */
-  --font-size-lg: clamp(1.25rem, 2vw + 0.5rem, 2rem);
-  --font-size-sm: clamp(0.875rem, 0.5vw + 0.5rem, 1rem);
-  --desktop-width: 800px; /* Max width for desktop layout */
-}
-
-/* =======================
-   Feature Support
-   ======================= */
-@supports (font-optical-sizing: auto) {
-  body,
-  button {
-    font-optical-sizing: auto;
-  }
-}
-
-/* =======================
-   Reset & Global Styles
-   ======================= */
+/* Reset y variables */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-/* =======================
-   Body & Layout
-   ======================= */
+:root {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --accent-primary: #00ff88;
+  --accent-secondary: #ff6b6b;
+  --border-color: #333333;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 body {
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-  font-size: var(--font-size-base);
-  line-height: 1.6;
-  background-color: var(--darker);
-  color: #fefefe;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 2.5rem 1rem;
-  gap: 1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
-}
-
-#app {
-  background: var(--darkest);
-  border-radius: 1rem;
-  padding: 2rem;
-  width: 100%;
-}
-
-/* =======================
-   Typography
-   ======================= */
-small {
-  font-size: var(--font-size-base);
-}
-
-/* =======================
-   Buttons & Controls
-   ======================= */
-button {
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-  font-size: var(--font-size-lg);
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-}
-
-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* =======================
-   Switcher Component
-   ======================= */
-.switcher {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 1rem;
-  width: 100%;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.6;
 }
 
-.switcher button {
-  background-color: var(--mid);
-  color: var(--darkest);
-  font-weight: 600;
-  transition: background-color 0.1s ease-in-out;
-}
-
-.switcher button.current,
-.switcher button.current:hover {
-  background-color: var(--darkest);
-  color: var(--accent);
-}
-
-/* =======================
-   Container & Display
-   ======================= */
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 1rem;
-}
-
-.display {
-  font-family: "Space Mono", monospace;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 3rem;
-  color: var(--accent);
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
   margin: 0 auto;
 }
 
-.display.blink {
-  animation: blink 1.2s ease-in-out infinite;
-  will-change: opacity;
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.centiseconds {
-  opacity: 0.7;
-  font-size: 0.8em;
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, var(--accent-primary), #00ccff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* =======================
-   Controls (Start, Pause, Reset)
-   ======================= */
-.controls {
+/* Navegación */
+.mode-selector {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 8px;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.nav-btn.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  box-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
+}
+
+/* Secciones de timer */
+.timer-section {
+  display: none;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.timer-section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Display del tiempo */
+.display-container {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.time-display {
+  font-size: 4rem;
+  font-weight: 300;
+  font-family: "Courier New", monospace;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 30px 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  letter-spacing: 0.1em;
+  min-height: 120px;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  border: 2px solid var(--border-color);
+  transition: var(--transition);
 }
 
-.controls button {
-  width: 50%;
-  display: inline-flex;
+.time-display.paused {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Input de tiempo personalizado */
+.time-input-container {
+  margin-bottom: 30px;
+}
+
+.time-input-display {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  cursor: pointer;
-  vertical-align: middle;
-  background-color: var(--mid);
-  border: 0.25rem solid var(--mid);
-  color: var(--darkest);
+  gap: 10px;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  font-family: "Courier New", monospace;
+}
+
+.time-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.time-part span {
+  background: var(--bg-secondary);
+  padding: 10px 15px;
+  border-radius: 8px;
+  min-width: 60px;
+  text-align: center;
+  border: 2px solid var(--border-color);
+}
+
+.time-part label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
-.controls button::before {
-  font-family: "Material Icons";
-  font-size: 1.5rem;
-  display: inline-block;
-  line-height: 1;
+.separator {
+  color: var(--text-secondary);
+  font-weight: bold;
+  margin: 0 5px;
 }
 
-/* Specific button states */
-button.paused {
-  background-color: var(--mid);
-  color: var(--darkest);
-}
-
-button.paused::before,
-button.start::before {
-  content: "play_arrow";
-}
-
-button.running {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: var(--darkest);
-}
-
-button.running::before {
-  content: "pause";
-}
-
-button.reset::before {
-  content: "replay";
-}
-
-/* =======================
-   Keypad Component
-   ======================= */
+/* Teclado numérico */
 .keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: 12px;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
-.keypad button {
-  background-color: var(--dark);
-  color: var(--light);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  padding: 1rem;
-  border: none;
-  border-radius: 0.5rem;
+.key-btn {
+  padding: 20px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 1.2rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.1s ease-in-out;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
 }
 
-.double-width {
-  grid-column: span 2;
+.key-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
 }
 
-/* =======================
-   Animations
-   ======================= */
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
+.key-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* =======================
-   Hover States (Desktop/Pointer Devices)
-   ======================= */
-@media (hover: hover) {
-  .switcher button:hover {
-    background-color: var(--accent);
-    color: var(--darkest);
-  }
-
-  .controls button:hover {
-    background-color: var(--darkest);
-    color: var(--mid);
-  }
-
-  button.paused:hover {
-    border-color: var(--mid);
-    color: var(--mid);
-  }
-
-  button.running:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .keypad button:hover {
-    background-color: var(--mid);
-    color: var(--darkest);
-  }
+.key-btn.zero {
+  grid-column: 1 / 3;
 }
 
-/* =======================
-   Responsive Styles
-   ======================= */
-@media (min-width: 768px) {
-  body {
-    padding: 2rem;
-    gap: 2rem;
-    min-height: 100vh;
+.key-btn.backspace {
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+}
+
+.key-btn.backspace:hover {
+  background: #ff5252;
+  border-color: #ff5252;
+}
+
+/* Controles */
+.controls {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.control-btn {
+  padding: 16px 32px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 120px;
+  box-shadow: var(--shadow);
+}
+
+.control-btn.primary {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.control-btn.primary:hover {
+  background: #00e67a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
+}
+
+.control-btn.secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.control-btn.secondary:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
   }
 
-  #app {
-    border-radius: 1rem;
-    max-width: var(--desktop-width);
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
   }
 
-  small {
-    font-size: var(--font-size-sm);
+  .time-display {
+    font-size: 2.5rem;
+    padding: 20px 15px;
+    min-height: 100px;
   }
 
-  button {
-    font-size: var(--font-size-base);
+  .time-input-display {
+    font-size: 1.5rem;
+    gap: 8px;
   }
 
-  .switcher {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    max-width: var(--desktop-width);
+  .time-part span {
+    padding: 8px 12px;
+    min-width: 50px;
   }
 
-  .display {
-    font-size: 6rem;
-  }
-
-  .controls,
   .keypad {
-    width: calc(var(--desktop-width) - 10rem);
-    margin: 0 auto;
+    gap: 10px;
+    max-width: 250px;
   }
 
-  .keypad button {
-    font-size: var(--font-size-base);
+  .key-btn {
+    padding: 15px;
+    font-size: 1.1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .control-btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 14px 28px;
+  }
+
+  .nav-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
 }
 
-/* =======================
-   Accessibility - Reduced Motion
-   ======================= */
-@media (prefers-reduced-motion: reduce) {
-  .display.blink {
-    animation: none;
+@media (max-width: 400px) {
+  .time-display {
+    font-size: 2rem;
   }
 
-  * {
-    transition-duration: 0.01ms !important;
+  .time-input-display {
+    font-size: 1.2rem;
+  }
+
+  .keypad {
+    max-width: 200px;
+  }
+
+  .key-btn {
+    padding: 12px;
+    font-size: 1rem;
   }
 }
